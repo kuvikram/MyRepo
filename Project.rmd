@@ -19,7 +19,7 @@ library(choroplethrMaps)
 ```
 ### RANKING of Top 10 countries having sorted by Happiness Index
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width = 10}
 ### Transforming the data into more readable format and removing unwanted columns and renaming the columns to more meaningful names.
 df <- readxl::read_excel("happiness_index.xls", sheet = 2)
 df$`Whisker-high` <- NULL
@@ -32,10 +32,13 @@ df <- rename(df, Happiness_Index = "Happiness score",GDP_Per_Capita = "Explained
 df <- mutate(df, ranking = rank(desc(df$Happiness_Index)))
 head(df[, c("Country", "ranking")], n=10)
 
-df_rank10 <- head(df[, c("Country", "ranking")], n=10)
+df_rank10 <- head(df[, c("Country", "ranking", "Happiness_Index")], n=10)
+df_rank10$Country <- factor(df_rank10$Country)
+df_rank10$Happiness_Index <- round(df_rank10$Happiness_Index, 2)
 
-ggplot(data=df_rank10, aes(x=ranking, y=reorder(Country, ranking)))+
-  geom_bar(stat = "identity", width=.5) + coord_flip()
+ggplot(data=df_rank10, aes(x=Country, y=reorder(Happiness_Index, Country), fill = ranking)) +
+  geom_bar(stat="identity", width = .8, color = "green") + 
+  geom_text(aes(label=round(Happiness_Index, 2)), vjust=5.6, color="white", size=3.3) + ylab("Happiness Score")
 
 ```
 
@@ -155,11 +158,27 @@ corrplot(correl, type = "lower", order = "FPC",tl.col = "black", tl.srt = 45)
 
 ### Heat Map of Happiness Index by Country
 
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 
-```{r, echo=FALSE, fig.height = 20, fig.width = 8}
+#qplot(Happiness_Index, Country, data = df, geom = "bin2d") ```{r, echo=FALSE, fig.height = 20, fig.width = 8}
 
-qplot(Happiness_Index, Country, data = df, geom = "bin2d")
+df1 <- select(df, c("Country", "Happiness_Index"))
 
+data(country.regions)
+cr <- country.regions
+
+#tolower(df1$Country)
+#order(df1$Country)
+
+df1 <- mutate(df1, Country = tolower(Country))
+df1 <- rename(df1, region = Country)
+
+cr <- cr[order(cr$region), ]
+df2 <- merge(df1, cr, by = 'region', all.x = TRUE)
+df2 <- rename(df2, value = Happiness_Index)
+
+country_choropleth(df2) +
+  scale_fill_brewer(palette = 4)
 
 ```
 
