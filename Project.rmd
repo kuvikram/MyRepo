@@ -5,7 +5,7 @@ output:
   pdf_document: default
 ---
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
 #loading all the packages
 #We are going to load all the packages we will be using throughout this project.
 library(readr)
@@ -58,14 +58,12 @@ happiness.plot <- function(name = ""){
   if(name != ""){
     
     df <- filter(df_spread, tolower(Country) == tolower(name))
-    qplot(Year, Life, data = df, geom = "point" ) + geom_smooth(stat = 'smooth', color = 'Blue', method = 'gam', formula = y ~ s(x, bs = "cs"))
-    
+    #qplot(Year, Life, data = df, geom = "point" ) + geom_smooth(stat = 'smooth', color = 'Blue', method = 'gam', formula = y ~ s(x, bs = "cs"))
+    #qplot(Year, Life, data = df, geom = "boxplot", group = 1) + scale_x_continuous(breaks=seq(2008, 2010, 2018))
+    ggplot(data = df, aes(Year, Life)) + geom_line(linetype="twodash", color="indianred4", size=2) +      scale_x_continuous(breaks=seq(2005, 2018, 1)) + ylab("Life Ladder")
   }
 }
-happiness.plot("Denmark")
-
-df
-
+happiness.plot("Finland")
 
 ```
 
@@ -172,15 +170,15 @@ cr <- country.regions
 #tolower(df1$Country)
 #order(df1$Country)
 
-df1 <- mutate(df1, Country = tolower(Country))
-df1 <- rename(df1, region = Country)
+df1 <- mutate(df1, region = tolower(Country), value = Happiness_Index)
+#df1 <- rename(df1, region = Country)
 
 cr <- cr[order(cr$region), ]
 df2 <- merge(df1, cr, by = 'region', all.x = TRUE)
 df2 <- rename(df2, value = Happiness_Index)
 
-country_choropleth(df2) +
-  scale_fill_brewer(palette = 4)
+country_choropleth(df2, title = "World Heat Map", legend = "Happiness Index") +
+  scale_fill_brewer(palette = 7) 
 
 ```
 
@@ -221,9 +219,9 @@ graph3 <- function(name = "India"){
     df_graph <- df_graph[t1, ]
     print(df_graph)
     #df <- filter(df_spread, tolower(Country) == tolower(name))
-    p1 <- qplot(Year, Life, data = df_graph, geom = "point" ) + geom_smooth(stat = 'smooth', color = 'Red', method = 'gam', formula = y ~ s(x, bs = "cs"))
-    p2 <- qplot(Year, GDP, data = df_graph, geom = "point" ) + geom_smooth(stat = 'smooth', color = 'Green', method = 'gam', formula = y ~ s(x, bs = "cs"))
-    p3 <- qplot(Year, Social, data = df_graph, geom = "point" ) + geom_smooth(stat = 'smooth', color = 'Blue', method = 'gam', formula = y ~ s(x, bs = "cs"))
+    p1 <- qplot(Year, Life, data = df_graph, geom = "point" ) + geom_smooth(stat = 'smooth', color = 'Red', method = 'gam', formula = y ~ s(x, bs = "cs")) + scale_x_continuous(breaks=seq(2005, 2018, 2)) + ylab("Life Ladder")
+    p2 <- qplot(Year, GDP, data = df_graph, geom = "point" ) + geom_smooth(stat = 'smooth', color = 'Green', method = 'gam', formula = y ~ s(x, bs = "cs")) + scale_x_continuous(breaks=seq(2005, 2018, 2)) + ylab("GDP per Capita")
+    p3 <- qplot(Year, Social, data = df_graph, geom = "point" ) + geom_smooth(stat = 'smooth', color = 'Blue', method = 'gam', formula = y ~ s(x, bs = "cs")) + scale_x_continuous(breaks=seq(2005, 2018, 2)) + ylab("Social Support")
     grid.arrange(p1, p2, p3, ncol=3, widths=c(10, 10, 10))
     
   }
