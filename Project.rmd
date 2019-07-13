@@ -16,6 +16,8 @@ library(ggplot2)
 library(corrplot)
 suppressPackageStartupMessages(library(choroplethr))
 library(choroplethrMaps)
+library(gridExtra)
+
 ```
 ### RANKING of Top 10 countries having sorted by Happiness Index
 
@@ -48,7 +50,6 @@ The rankings in Table Above of World Happiness Report 2019 use data that come fr
 
 ```{r, echo=FALSE}
 df_spread <- readxl::read_excel("happiness_index.xls", sheet = 1)
-
 df_spread <- df_spread[,c(1:3)]
 df_spread <- rename(df_spread , Country = "Country name", Life = "Life Ladder")
 df_spread$Life <- round(df_spread$Life, 2)
@@ -63,6 +64,7 @@ happiness.plot <- function(name = ""){
 }
 happiness.plot("Denmark")
 
+df
 
 
 ```
@@ -183,7 +185,7 @@ country_choropleth(df2) +
 ```
 
 ### This function shows data for 10 years based on country and factor selected. By default it shows the Per capita income for country Finland.
-### It shows list of factors which can be selected as well as country.
+### List of factors are also shown which helps to select the factors by country
 
 ``` {r, echo=FALSE}
 df_spread <- readxl::read_excel("happiness_index.xls", sheet = 1)
@@ -192,7 +194,7 @@ p1 <- function(c1="Finland", f1="Log GDP per capita"){
   df1 <- select(df_spread, c('Country name', 'Year', f1))
   g1 <- grep(tolower(c1), tolower(df1$`Country name`), fixed=TRUE)
   df3 <- df1[g1, ]
-  tmp <- df3[3]
+  #tmp <- df3[3]
   print(df3)
   
   #qplot(Year, f1, data = df3, geom = "point")
@@ -200,4 +202,32 @@ p1 <- function(c1="Finland", f1="Log GDP per capita"){
 
 #p1("Finland", "Generosity")
 p1()
+```
+
+
+### This function helps to find out how 3 important factors i.e. Life Ladder, GDP and Social Support change in last 10 years for a Country. 
+### Need to select country otherwise by default it shows for India
+
+``` {r, echo = FALSE, warning = FALSE, message = FALSE, fig.width=10}
+df_spread <- readxl::read_excel("happiness_index.xls", sheet = 1)
+df_graph <- df_spread[,c(1:5)]
+df_graph <- rename(df_graph, Country = "Country name", Life = "Life Ladder", GDP = "Log GDP per capita", Social = "Social support")
+df_graph$Life <- round(df_graph$Life, 2)
+
+graph3 <- function(name = "India"){
+  if(name != ""){
+    
+    t1 <- grep(tolower(name), tolower(df_graph$Country), fixed = TRUE)
+    df_graph <- df_graph[t1, ]
+    print(df_graph)
+    #df <- filter(df_spread, tolower(Country) == tolower(name))
+    p1 <- qplot(Year, Life, data = df_graph, geom = "point" ) + geom_smooth(stat = 'smooth', color = 'Red', method = 'gam', formula = y ~ s(x, bs = "cs"))
+    p2 <- qplot(Year, GDP, data = df_graph, geom = "point" ) + geom_smooth(stat = 'smooth', color = 'Green', method = 'gam', formula = y ~ s(x, bs = "cs"))
+    p3 <- qplot(Year, Social, data = df_graph, geom = "point" ) + geom_smooth(stat = 'smooth', color = 'Blue', method = 'gam', formula = y ~ s(x, bs = "cs"))
+    grid.arrange(p1, p2, p3, ncol=3, widths=c(10, 10, 10))
+    
+  }
+}
+graph3()
+
 ```
