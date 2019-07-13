@@ -4,10 +4,10 @@ output:
   html_document: default
   pdf_document: default
 ---
-We are going to load all the packages we will be using throughout this project.
 
 ```{r, echo=FALSE}
 #loading all the packages
+#We are going to load all the packages we will be using throughout this project.
 library(readr)
 library(readxl)
 suppressPackageStartupMessages(library(dplyr))
@@ -17,10 +17,10 @@ library(corrplot)
 suppressPackageStartupMessages(library(choroplethr))
 library(choroplethrMaps)
 ```
+### RANKING of Top 10 countries having sorted by Happiness Index
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 ### Transforming the data into more readable format and removing unwanted columns and renaming the columns to more meaningful names.
-
-
-```{r, echo=FALSE}
 df <- readxl::read_excel("happiness_index.xls", sheet = 2)
 df$`Whisker-high` <- NULL
 df$`Whisker-low` <- NULL
