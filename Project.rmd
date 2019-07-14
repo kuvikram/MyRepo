@@ -192,14 +192,16 @@ p1 <- function(c1="Finland", f1="Log GDP per capita"){
   df1 <- select(df_spread, c('Country name', 'Year', f1))
   g1 <- grep(tolower(c1), tolower(df1$`Country name`), fixed=TRUE)
   df3 <- df1[g1, ]
-  #tmp <- df3[3]
+  tmp <- df3[3]
   print(df3)
   
   #qplot(Year, f1, data = df3, geom = "point")
+  #ggplot(df3, aes(x=Year, y = !!tmp)) + geom_line()
+  #ggplot(df3) + geom_line(aes(Year, tmp))
 }
 
-#p1("Finland", "Generosity")
-p1()
+p1("Finland", "Generosity")
+#p1()
 ```
 
 
